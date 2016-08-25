@@ -1,0 +1,485 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1500
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Medium;\f1\fswiss\fcharset0 ArialMT;\f2\fnil\fcharset0 Monaco;
+\f3\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red38\green38\blue38;\red53\green118\blue190;\red242\green242\blue242;
+\red255\green255\blue255;}
+{\*\expandedcolortbl;\csgray\c100000;\cssrgb\c20000\c20000\c20000;\cssrgb\c25882\c54510\c79216;\cssrgb\c96078\c96078\c96078;
+\csgray\c100000;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{circle\}}{\leveltext\leveltemplateid2\'01\uc0\u9702 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{circle\}}{\leveltext\leveltemplateid102\'01\uc0\u9702 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid201\'01\'00;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid3}
+{\list\listtemplateid4\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid301\'01\'00;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid4}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}{\listoverride\listid4\listoverridecount0\ls4}}
+\margl1440\margr1440\vieww16380\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs72 \cf2 \expnd0\expndtw0\kerning0
+Color conversion formulas RGB to xy and back\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs30 \cf2 This document describes the conversion between RGB and xy. It is important to differentiate between the various light types, because they do not all support the same color gamut. For example, the hue bulbs are very good at showing nice whites, while the LivingColors are generally a bit better at colors, like green and cyan. For more info, check out the {\field{\*\fldinst{HYPERLINK "http://www.developers.meethue.com/documentation/supported-lights"}}{\fldrslt \cf3 supported lights}} page.\
+Our implementations of these functions are contained in the PHUtility class in our GitHub repo for the Hue SDK ({\field{\*\fldinst{HYPERLINK "https://github.com/PhilipsHue/PhilipsHueSDK-iOS-OSX"}}{\fldrslt \cf3 https://github.com/PhilipsHue/PhilipsHueSDK-iOS-OSX}}). You can see source code of our Objective-C iOS implementation of these transformations in the last part of this document.\
+The method signature for converting from xy values and brightness to a color is:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	\'95	}\expnd0\expndtw0\kerning0
+For iOS:\
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\partightenfactor0
+\ls1\ilvl1\cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
++ (UIColor*)colorFromXY:(CGPoint)xy forModel:(NSString*)model\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	\'95	}\expnd0\expndtw0\kerning0
+For OS X:\
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\partightenfactor0
+\ls1\ilvl1\cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
++ (NSColor*)colorFromXY:(CGPoint)xy forModel:(NSString*)model\
+\pard\pardeftab720\partightenfactor0
+\cf2 The method signature for converting from a color to xy and brightness values:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls2\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	\'95	}\expnd0\expndtw0\kerning0
+For iOS:\
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\partightenfactor0
+\ls2\ilvl1\cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
++ (CGPoint)calculateXY:(UIColor*)color forModel:(NSString*)model\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls2\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	\'95	}\expnd0\expndtw0\kerning0
+For OS X:\
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\partightenfactor0
+\ls2\ilvl1\cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
++ (CGPoint)calculateXY:(NSColor*)color forModel:(NSString*)model\
+\pard\pardeftab720\partightenfactor0
+\cf2 The model parameter of both methods is the modelNumber value of a PHLight object. The advantage of this model being settable is that you can decide if you want to limit the color of all lights to a certain model, or that every light should do the colors within its own range.\
+Current Philips lights have a {\field{\*\fldinst{HYPERLINK "http://www.developers.meethue.com/documentation/core-concepts#color_gets_more_complicated"}}{\fldrslt \cf3 color gamut}} defined by 3 points, making it a triangle.\
+For the {\field{\*\fldinst{HYPERLINK "http://www.developers.meethue.com/documentation/supported-lights"}}{\fldrslt \cf3 hue bulb}} (Gamut B) the corners of the triangle are:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf2 \cb4 Red: 0.675, 0.322\
+Green: 0.409, 0.518\
+Blue: 0.167, 0.04\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs30 \cf2 \cb5 For {\field{\*\fldinst{HYPERLINK "http://www.developers.meethue.com/documentation/supported-lights"}}{\fldrslt \cf3 LivingColors Bloom, Aura, Light Strips and Iris}} (Gamut A) the triangle corners are:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf2 \cb4 Red: 0.704, 0.296\
+Green: 0.2151, 0.7106\
+Blue: 0.138, 0.08\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs30 \cf2 \cb5 If you have light which is not one of those, you should use:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf2 \cb4 Red: 1.0, 0\
+Green: 0.0, 1.0\
+Blue: 0.0, 0.0\
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs68 \cf2 \cb5 Color(RGB) to xy\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs30 \cf2 We start with the color to xy conversion, which we will do in a couple of steps:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls3\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	1	}\expnd0\expndtw0\kerning0
+Get the RGB values from your color object and convert them to be between 0 and 1. So the RGB color (255, 0, 100) becomes (1.0, 0.0, 0.39)\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 {\listtext	2	}\expnd0\expndtw0\kerning0
+Apply a gamma correction to the RGB values, which makes the color more vivid and more the like the color displayed on the screen of your device. This gamma correction is also applied to the screen of your computer or phone, thus we need this to create a similar color on the light as on screen. This is done by the following formulas:\uc0\u8232 
+\f2\fs26 \cb4 float red = (red > 0.04045f) ? pow((red + 0.055f) / (1.0f + 0.055f), 2.4f) : (red / 12.92f);\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls3\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	3	}\expnd0\expndtw0\kerning0
+float green = (green > 0.04045f) ? pow((green + 0.055f) / (1.0f + 0.055f), 2.4f) : (green / 12.92f);\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 {\listtext	4	}\expnd0\expndtw0\kerning0
+float blue = (blue > 0.04045f) ? pow((blue + 0.055f) / (1.0f + 0.055f), 2.4f) : (blue / 12.92f); \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls3\ilvl0
+\f1\fs30 \cf2 \cb5 \kerning1\expnd0\expndtw0 {\listtext	5	}\expnd0\expndtw0\kerning0
+\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 {\listtext	6	}\expnd0\expndtw0\kerning0
+Convert the RGB values to XYZ using the Wide RGB D65 conversion formula The formulas used:\uc0\u8232 
+\f2\fs26 \cb4 float X = red * 0.664511f + green * 0.154324f + blue * 0.162028f;\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls3\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	7	}\expnd0\expndtw0\kerning0
+float Y = red * 0.283881f + green * 0.668433f + blue * 0.047685f;\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 {\listtext	8	}\expnd0\expndtw0\kerning0
+float Z = red * 0.000088f + green * 0.072310f + blue * 0.986039f;\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls3\ilvl0
+\f1\fs30 \cf2 \cb5 \kerning1\expnd0\expndtw0 {\listtext	9	}\expnd0\expndtw0\kerning0
+\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 {\listtext	10	}\expnd0\expndtw0\kerning0
+Calculate the xy values from the XYZ values\uc0\u8232 
+\f2\fs26 \cb4 float x = X / (X + Y + Z);\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls3\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	11	}\expnd0\expndtw0\kerning0
+float y = Y / (X + Y + Z);\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls3\ilvl0
+\f1\fs30 \cf2 \cb5 \kerning1\expnd0\expndtw0 {\listtext	12	}\expnd0\expndtw0\kerning0
+\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 {\listtext	13	}\expnd0\expndtw0\kerning0
+Check if the found xy value is within the color gamut of the light, if not continue with step 6, otherwise step 7 When we send a value which the light is not capable of, the resulting color might not be optimal. Therefore we try to only send values which are inside the color gamut of the selected light.\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 {\listtext	14	}\expnd0\expndtw0\kerning0
+Calculate the closest point on the color gamut triangle and use that as xy value The closest value is calculated by making a perpendicular line to one of the lines the triangle consists of and when it is then still not inside the triangle, we choose the closest corner point of the triangle.\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 {\listtext	15	}\expnd0\expndtw0\kerning0
+Use the Y value of XYZ as brightness The Y value indicates the brightness of the converted color.\
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs68 \cf2 xy to color(RGB)\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs30 \cf2 The xy to color conversion is almost the same, but in reverse order.\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls4\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	1	}\expnd0\expndtw0\kerning0
+Check if the xy value is within the color gamut of the lamp, if not continue with step 2, otherwise step 3 We do this to calculate the most accurate color the given light can actually do.\
+\ls4\ilvl0\kerning1\expnd0\expndtw0 {\listtext	2	}\expnd0\expndtw0\kerning0
+Calculate the closest point on the color gamut triangle and use that as xy value See step 6 of color to xy.\
+\ls4\ilvl0\kerning1\expnd0\expndtw0 {\listtext	3	}\expnd0\expndtw0\kerning0
+Calculate XYZ values Convert using the following formulas:\uc0\u8232 
+\f2\fs26 \cb4 float x = x; // the given x value\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls4\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	4	}\expnd0\expndtw0\kerning0
+float y = y; // the given y value\
+\ls4\ilvl0\kerning1\expnd0\expndtw0 {\listtext	5	}\expnd0\expndtw0\kerning0
+float z = 1.0f - x - y;\
+\ls4\ilvl0\kerning1\expnd0\expndtw0 {\listtext	6	}\expnd0\expndtw0\kerning0
+float Y = brightness; // The given brightness value\
+\ls4\ilvl0\kerning1\expnd0\expndtw0 {\listtext	7	}\expnd0\expndtw0\kerning0
+float X = (Y / y) * x;\
+\ls4\ilvl0\kerning1\expnd0\expndtw0 {\listtext	8	}\expnd0\expndtw0\kerning0
+float Z = (Y / y) * z;\uc0\u8232 
+\f1\fs30 \cb5 \'a0\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls4\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	9	}\expnd0\expndtw0\kerning0
+Convert to RGB using Wide RGB D65 conversion\uc0\u8232 
+\f2\fs26 \cb4 float r =  X * 1.656492f - Y * 0.354851f - Z * 0.255038f;\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls4\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	10	}\expnd0\expndtw0\kerning0
+float g = -X * 0.707196f + Y * 1.655397f + Z * 0.036152f;\
+\ls4\ilvl0\kerning1\expnd0\expndtw0 {\listtext	11	}\expnd0\expndtw0\kerning0
+float b =  X * 0.051713f - Y * 0.121364f + Z * 1.011530f;\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls4\ilvl0
+\f1\fs30 \cf2 \cb5 \kerning1\expnd0\expndtw0 {\listtext	12	}\expnd0\expndtw0\kerning0
+\
+\ls4\ilvl0\kerning1\expnd0\expndtw0 {\listtext	13	}\expnd0\expndtw0\kerning0
+Apply reverse gamma correction\uc0\u8232 
+\f2\fs26 \cb4 r = r <= 0.0031308f ? 12.92f * r : (1.0f + 0.055f) * pow(r, (1.0f / 2.4f)) - 0.055f;\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls4\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	14	}\expnd0\expndtw0\kerning0
+g = g <= 0.0031308f ? 12.92f * g : (1.0f + 0.055f) * pow(g, (1.0f / 2.4f)) - 0.055f;\
+\ls4\ilvl0\kerning1\expnd0\expndtw0 {\listtext	15	}\expnd0\expndtw0\kerning0
+b = b <= 0.0031308f ? 12.92f * b : (1.0f + 0.055f) * pow(b, (1.0f / 2.4f)) - 0.055f;
+\f1\fs30 \cb5 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls4\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	16	}\expnd0\expndtw0\kerning0
+Convert the RGB values to your color object\
+\pard\pardeftab720\partightenfactor0
+\cf2 The rgb values from the above formulas are between 0.0 and 1.0.\
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs68 \cf2 Code Examples\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs30 \cf2 The following code is an extract from the relevant methods in the iOS SDK. It is provided on an as is basis to help you create your own versions of the color conversion utilities. Note that the UIColor class contains a method to obtain Hue/Saturation values {\field{\*\fldinst{HYPERLINK "http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIColor_Class/Reference/Reference.html"}}{\fldrslt \cf3 http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIColor_Class/Reference/Reference.html}}\
+\'a0\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf2 \cb4 + (UIColor *)colorFromXY:(CGPoint)xy forModel:(NSString*)model \{        \
+    NSArray *colorPoints = [self colorPointsForModel:model];\
+    BOOL inReachOfLamps = [self checkPointInLampsReach:xy withColorPoints:colorPoints];\
+\
+    if (!inReachOfLamps) \{\
+        //It seems the colour is out of reach\
+        //let's find the closest colour we can produce with our lamp and send this XY value out.\
+\
+        //Find the closest point on each line in the triangle.\
+        CGPoint pAB =[self getClosestPointToPoints:[self getPointFromValue:[colorPoints objectAtIndex:cptRED]] point2:[self getPointFromValue:[colorPoints objectAtIndex:cptGREEN]] point3:xy];\
+        CGPoint pAC = [self getClosestPointToPoints:[self getPointFromValue:[colorPoints objectAtIndex:cptBLUE]] point2:[self getPointFromValue:[colorPoints objectAtIndex:cptRED]] point3:xy];\
+        CGPoint pBC = [self getClosestPointToPoints:[self getPointFromValue:[colorPoints objectAtIndex:cptGREEN]] point2:[self getPointFromValue:[colorPoints objectAtIndex:cptBLUE]] point3:xy];\
+\
+        //Get the distances per point and see which point is closer to our Point.\
+        float dAB = [self getDistanceBetweenTwoPoints:xy point2:pAB];\
+        float dAC = [self getDistanceBetweenTwoPoints:xy point2:pAC];\
+        float dBC = [self getDistanceBetweenTwoPoints:xy point2:pBC];\
+\
+        float lowest = dAB;\
+        CGPoint closestPoint = pAB;\
+\
+        if (dAC < lowest) \{\
+            lowest = dAC;\
+            closestPoint = pAC;\
+        \}\
+        if (dBC < lowest) \{\
+            lowest = dBC;\
+            closestPoint = pBC;\
+        \}\
+\
+        //Change the xy value to a value which is within the reach of the lamp.\
+        xy.x = closestPoint.x;\
+        xy.y = closestPoint.y;\
+    \}\
+\
+    float x = xy.x;\
+    float y = xy.y;\
+    float z = 1.0f - x - y;\
+\
+    float Y = 1.0f;\
+    float X = (Y / y) * x;\
+    float Z = (Y / y) * z;\
+\
+    // sRGB D65 conversion\
+    float r =  X * 1.656492f - Y * 0.354851f - Z * 0.255038f;\
+    float g = -X * 0.707196f + Y * 1.655397f + Z * 0.036152f;\
+    float b =  X * 0.051713f - Y * 0.121364f + Z * 1.011530f;\
+\
+    if (r > b && r > g && r > 1.0f) \{\
+        // red is too big\
+        g = g / r;\
+        b = b / r;\
+        r = 1.0f;\
+    \}\
+    else if (g > b && g > r && g > 1.0f) \{\
+        // green is too big\
+        r = r / g;\
+        b = b / g;\
+        g = 1.0f;\
+    \}\
+    else if (b > r && b > g && b > 1.0f) \{\
+        // blue is too big\
+        r = r / b;\
+        g = g / b;\
+        b = 1.0f;\
+    \}\
+\
+    // Apply gamma correction\
+    r = r <= 0.0031308f ? 12.92f * r : (1.0f + 0.055f) * pow(r, (1.0f / 2.4f)) - 0.055f;\
+    g = g <= 0.0031308f ? 12.92f * g : (1.0f + 0.055f) * pow(g, (1.0f / 2.4f)) - 0.055f;\
+    b = b <= 0.0031308f ? 12.92f * b : (1.0f + 0.055f) * pow(b, (1.0f / 2.4f)) - 0.055f;\
+\
+    if (r > b && r > g) \{\
+        // red is biggest\
+        if (r > 1.0f) \{\
+            g = g / r;\
+            b = b / r;\
+            r = 1.0f;\
+        \}\
+    \}\
+    else if (g > b && g > r) \{\
+        // green is biggest\
+        if (g > 1.0f) \{\
+            r = r / g;\
+            b = b / g;\
+            g = 1.0f;\
+        \}\
+    \}\
+    else if (b > r && b > g) \{\
+        // blue is biggest\
+        if (b > 1.0f) \{\
+            r = r / b;\
+            g = g / b;\
+            b = 1.0f;\
+        \}\
+    \}\
+\
+    return [UIColor colorWithRed:r green:g blue:b alpha:1.0f];\
+\}\
+\
++ (NSArray *)colorPointsForModel:(NSString*)model \{\
+    NSMutableArray *colorPoints = [NSMutableArray array];\
+\
+    NSArray *hueBulbs = [NSArray arrayWithObjects:@"LCT001" /* Hue A19 */,\
+                         @"LCT002" /* Hue BR30 */,\
+                         @"LCT003" /* Hue GU10 */, nil];\
+    NSArray *livingColors = [NSArray arrayWithObjects:  @"LLC001" /* Monet, Renoir, Mondriaan (gen II) */,\
+                             @"LLC005" /* Bloom (gen II) */,\
+                             @"LLC006" /* Iris (gen III) */,\
+                             @"LLC007" /* Bloom, Aura (gen III) */,\
+                             @"LLC011" /* Hue Bloom */,\
+                             @"LLC012" /* Hue Bloom */,\
+                             @"LLC013" /* Storylight */,\
+                             @"LST001" /* Light Strips */, nil];\
+    if ([hueBulbs containsObject:model]) \{\
+        // Hue bulbs color gamut triangle\
+        [colorPoints addObject:[self getValueFromPoint:CGPointMake(0.674F, 0.322F)]];     // Red\
+        [colorPoints addObject:[self getValueFromPoint:CGPointMake(0.408F, 0.517F)]];     // Green\
+        [colorPoints addObject:[self getValueFromPoint:CGPointMake(0.168F, 0.041F)]];     // Blue\
+\
+    \}\
+    else if ([livingColors containsObject:model]) \{\
+        // LivingColors color gamut triangle\
+        [colorPoints addObject:[self getValueFromPoint:CGPointMake(0.703F, 0.296F)]];     // Red\
+        [colorPoints addObject:[self getValueFromPoint:CGPointMake(0.214F, 0.709F)]];     // Green\
+        [colorPoints addObject:[self getValueFromPoint:CGPointMake(0.139F, 0.081F)]];     // Blue\
+    \}\
+    else \{\
+        // Default construct triangle wich contains all values\
+        [colorPoints addObject:[self getValueFromPoint:CGPointMake(1.0F, 0.0F)]];         // Red\
+        [colorPoints addObject:[self getValueFromPoint:CGPointMake(0.0F, 1.0F)]];         // Green\
+        [colorPoints addObject:[self getValueFromPoint:CGPointMake(0.0F, 0.0F)]];         // Blue\
+    \}\
+\
+    return colorPoints;\
+\}\
+\
++ (CGPoint)calculateXY:(UIColor *)color forModel:(NSString*)model \{\
+    CGColorRef cgColor = [color CGColor];\
+\
+    const CGFloat *components = CGColorGetComponents(cgColor);\
+    long numberOfComponents = CGColorGetNumberOfComponents(cgColor);\
+\
+    // Default to white\
+    CGFloat red = 1.0f;\
+    CGFloat green = 1.0f;\
+    CGFloat blue = 1.0f;\
+\
+    if (numberOfComponents == 4) \{\
+        // Full color\
+        red = components[0];\
+        green = components[1];\
+        blue = components[2];\
+    \}\
+    else if (numberOfComponents == 2) \{\
+        // Greyscale color\
+        red = green = blue = components[0];\
+    \}\
+\
+    // Apply gamma correction\
+    float r = (red   > 0.04045f) ? pow((red   + 0.055f) / (1.0f + 0.055f), 2.4f) : (red   / 12.92f);\
+    float g = (green > 0.04045f) ? pow((green + 0.055f) / (1.0f + 0.055f), 2.4f) : (green / 12.92f);\
+    float b = (blue  > 0.04045f) ? pow((blue  + 0.055f) / (1.0f + 0.055f), 2.4f) : (blue  / 12.92f);\
+\
+    // Wide gamut conversion D65\
+    float X = r * 0.664511f + g * 0.154324f + b * 0.162028f;\
+    float Y = r * 0.283881f + g * 0.668433f + b * 0.047685f;\
+    float Z = r * 0.000088f + g * 0.072310f + b * 0.986039f;\
+\
+    float cx = X / (X + Y + Z);\
+    float cy = Y / (X + Y + Z);\
+\
+    if (isnan(cx)) \{\
+        cx = 0.0f;\
+    \}\
+\
+    if (isnan(cy)) \{\
+        cy = 0.0f;\
+    \}\
+\
+    //Check if the given XY value is within the colourreach of our lamps.\
+\
+    CGPoint xyPoint =  CGPointMake(cx,cy);\
+    NSArray *colorPoints = [self colorPointsForModel:model];\
+    BOOL inReachOfLamps = [self checkPointInLampsReach:xyPoint withColorPoints:colorPoints];\
+\
+    if (!inReachOfLamps) \{\
+        //It seems the colour is out of reach\
+        //let's find the closest colour we can produce with our lamp and send this XY value out.\
+\
+        //Find the closest point on each line in the triangle.\
+        CGPoint pAB =[self getClosestPointToPoints:[self getPointFromValue:[colorPoints objectAtIndex:cptRED]] point2:[self getPointFromValue:[colorPoints objectAtIndex:cptGREEN]] point3:xyPoint];\
+        CGPoint pAC = [self getClosestPointToPoints:[self getPointFromValue:[colorPoints objectAtIndex:cptBLUE]] point2:[self getPointFromValue:[colorPoints objectAtIndex:cptRED]] point3:xyPoint];\
+        CGPoint pBC = [self getClosestPointToPoints:[self getPointFromValue:[colorPoints objectAtIndex:cptGREEN]] point2:[self getPointFromValue:[colorPoints objectAtIndex:cptBLUE]] point3:xyPoint];\
+\
+        //Get the distances per point and see which point is closer to our Point.\
+        float dAB = [self getDistanceBetweenTwoPoints:xyPoint point2:pAB];\
+        float dAC = [self getDistanceBetweenTwoPoints:xyPoint point2:pAC];\
+        float dBC = [self getDistanceBetweenTwoPoints:xyPoint point2:pBC];\
+\
+        float lowest = dAB;\
+        CGPoint closestPoint = pAB;\
+\
+        if (dAC < lowest) \{\
+            lowest = dAC;\
+            closestPoint = pAC;\
+        \}\
+        if (dBC < lowest) \{\
+            lowest = dBC;\
+            closestPoint = pBC;\
+        \}\
+\
+        //Change the xy value to a value which is within the reach of the lamp.\
+        cx = closestPoint.x;\
+        cy = closestPoint.y;\
+    \}\
+\
+    return CGPointMake(cx, cy);\
+\}\
+\
+/**\
+ * Calculates crossProduct of two 2D vectors / points.\
+ *\
+ * @param p1 first point used as vector\
+ * @param p2 second point used as vector\
+ * @return crossProduct of vectors\
+ */\
++ (float)crossProduct:(CGPoint)p1 point2:(CGPoint)p2 \{\
+    return (p1.x * p2.y - p1.y * p2.x);\
+\}\
+\
+/**\
+ * Find the closest point on a line.\
+ * This point will be within reach of the lamp.\
+ *\
+ * @param A the point where the line starts\
+ * @param B the point where the line ends\
+ * @param P the point which is close to a line.\
+ * @return the point which is on the line.\
+ */\
++ (CGPoint)getClosestPointToPoints:(CGPoint)A point2:(CGPoint)B point3:(CGPoint)P \{\
+    CGPoint AP = CGPointMake(P.x - A.x, P.y - A.y);\
+    CGPoint AB = CGPointMake(B.x - A.x, B.y - A.y);\
+    float ab2 = AB.x * AB.x + AB.y * AB.y;\
+    float ap_ab = AP.x * AB.x + AP.y * AB.y;\
+\
+    float t = ap_ab / ab2;\
+\
+    if (t < 0.0f) \{\
+        t = 0.0f;\
+    \}\
+    else if (t > 1.0f) \{\
+        t = 1.0f;\
+    \}\
+\
+    CGPoint newPoint = CGPointMake(A.x + AB.x * t, A.y + AB.y * t);\
+    return newPoint;\
+\}\
+\
+/**\
+ * Find the distance between two points.\
+ *\
+ * @param one\
+ * @param two\
+ * @return the distance between point one and two\
+ */\
++ (float)getDistanceBetweenTwoPoints:(CGPoint)one point2:(CGPoint)two \{\
+    float dx = one.x - two.x; // horizontal difference\
+    float dy = one.y - two.y; // vertical difference\
+    float dist = sqrt(dx * dx + dy * dy);\
+\
+    return dist;\
+\}\
+\
+/**\
+ * Method to see if the given XY value is within the reach of the lamps.\
+ *\
+ * @param p the point containing the X,Y value\
+ * @return true if within reach, false otherwise.\
+ */\
++ (BOOL)checkPointInLampsReach:(CGPoint)p withColorPoints:(NSArray*)colorPoints \{\
+    CGPoint red =   [self getPointFromValue:[colorPoints objectAtIndex:cptRED]];\
+    CGPoint green = [self getPointFromValue:[colorPoints objectAtIndex:cptGREEN]];\
+    CGPoint blue =  [self getPointFromValue:[colorPoints objectAtIndex:cptBLUE]];\
+\
+    CGPoint v1 = CGPointMake(green.x - red.x, green.y - red.y);\
+    CGPoint v2 = CGPointMake(blue.x - red.x, blue.y - red.y);\
+\
+    CGPoint q = CGPointMake(p.x - red.x, p.y - red.y);\
+\
+    float s = [self crossProduct:q point2:v2] / [self crossProduct:v1 point2:v2];\
+    float t = [self crossProduct:v1 point2:q] / [self crossProduct:v1 point2:v2];\
+\
+    if ( (s >= 0.0f) && (t >= 0.0f) && (s + t <= 1.0f)) \{\
+        return true;\
+    \}\
+    else \{\
+        return false;\
+    \}\
+\}}
